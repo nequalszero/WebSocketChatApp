@@ -1,0 +1,25 @@
+.header-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: $header-color;
+  font: 1em sans-serif;
+  color: $header-text-color;
+}
+
+.header-nav {
+  display: flex;
+  justify-content: flex-end;
+  width: 90%;
+  padding: 10px 0px;
+  font-weight: bold;
+}
+
+.header-nav li {
+  padding: 0px 10px;
+}
+
+.header-nav li:hover {
+  cursor: pointer;
+  color: white;
+}

@@ -6,19 +6,22 @@ import Root from './components/root';
 import configureStore from './store/store';
 import Modal from 'react-modal';
 
-import {login, signup, logout} from './actions/session_actions';
-
-window.login = login;
-window.signup = signup;
-window.logout = logout;
+//Helpers
+import { defaultState } from './lib/session_helper';
+import merge from 'lodash/merge';
 
 const initializeStore = () => {
-  if (window.localStorage.currentUser) {
+  if (window.localStorage.currentUser && JSON.parse(window.localStorage.currentUser)) {
     let currentUser = JSON.parse(window.localStorage.currentUser);
-    const preloadedState = { session: { currentUser: currentUser }};
+
+    const preloadedState = {
+      session: Object.assign({}, defaultState, { currentUser: currentUser })
+    };
+
     return configureStore(preloadedState);
+  } else {
+    return configureStore();
   }
-  return configureStore();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

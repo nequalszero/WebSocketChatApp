@@ -10,6 +10,12 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- *= require_tree .
- *= require_self
  */
+// CSS Reset
+@import "base/reset.scss";
+@import "base/colors.scss";
+
+// Partials
+@import "partials/app.scss";
+@import "partials/header.scss";
+@import "partials/auth_modal.scss";

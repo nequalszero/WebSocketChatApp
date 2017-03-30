@@ -1,7 +1,5 @@
 # Project Setup Checklist
-Here's a Rails/React/Redux setup checklist. It should only serve as a reminder.
-Ask a TA if you don't understand _why_ you're configuring something on this
-list.
+Here's a Rails/React/Redux setup checklist.
 
 * [ ] `rails new`
   * Add `--database=postgresql` if using Postgres.
@@ -66,14 +64,14 @@ Now that you have Rails installed and ready, start your project
 with the following command:
 
 ```
-rails new MyProjectName --database=postgresql
+rails new MyProjectName --database=postgresql --skip-turbolinks
 ```
 
 If you have Rails 5 installed, you can start a Rails 4 project
 using the following command:
 
 ```
-rails _4.2.7_ new MyProjectName --database=postgresql
+rails _4.2.7_ new MyProjectName --database=postgresql --skip-turbolinks
 ```
 
 ## Use Common Debugging Gems

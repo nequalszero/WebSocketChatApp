@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
+import HeaderContainer from './Header/header_container';
+import AuthContainer from './Auth/auth_container';
 
 class App extends React.Component {
   constructor(props) {
@@ -8,7 +10,11 @@ class App extends React.Component {
 
   render() {
     return (
-      <h2>Hello World from app</h2>
+      <div className="app">
+        <HeaderContainer />
+        <AuthContainer />
+        {this.props.children}
+      </div>
     );
   }
 }

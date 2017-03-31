@@ -34,13 +34,11 @@ const SessionReducer = (oldState = _nullUser, action) => {
       resetPanelsAndErrors(newState);
       let currentUser = action.currentUser;
       newState.currentUser = currentUser;
-      window.localStorage.setItem("currentUser", JSON.stringify(currentUser));
       return newState;
 
     case RECEIVE_SESSION_ERRORS:
       newState.errors[`${action.formType}`] = action.errors;
       newState.currentUser = null;
-      window.localStorage.setItem("currentUser", JSON.stringify(""));
       return newState;
 
     case OPEN_LOGIN:

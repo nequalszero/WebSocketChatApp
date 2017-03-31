@@ -1,7 +1,8 @@
 <script id="bootstrap-current-user" type="text/javascript">
   <% if current_user %>
-  	window.localStorage.setItem("currentUser", JSON.stringify( <%= render("api/users/user.json.jbuilder",
-  		user: current_user).html_safe %>))
+  	window.localStorage.setItem("currentUser", JSON.stringify( <%= User.serialize(current_user).to_json.html_safe %>))
+  <% else %>
+    window.localStorage.setItem("currentUser", JSON.stringify(""))
   <% end %>
 </script>
 

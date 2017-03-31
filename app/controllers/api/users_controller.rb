@@ -4,7 +4,8 @@ class Api::UsersController < ApplicationController
 
 		if @user.save
 			sign_in(@user)
-			render "api/users/show"
+      # render "api/users/show"
+			render json: User.serialize(@user)
 		else
 			render json: @user.errors.full_messages, status: 422
 		end

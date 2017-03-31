@@ -17443,13 +17443,11 @@ var SessionReducer = function SessionReducer() {
       resetPanelsAndErrors(newState);
       var currentUser = action.currentUser;
       newState.currentUser = currentUser;
-      window.localStorage.setItem("currentUser", JSON.stringify(currentUser));
       return newState;
 
     case _session_actions.RECEIVE_SESSION_ERRORS:
       newState.errors['' + action.formType] = action.errors;
       newState.currentUser = null;
-      window.localStorage.setItem("currentUser", JSON.stringify(""));
       return newState;
 
     case _session_actions.OPEN_LOGIN:

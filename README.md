@@ -1,4 +1,16 @@
-# Project Setup Checklist
+# React/Redux/Rails Template
+## Summary
+This project was setup using the project setup directions found below with some extra gems and packages included.  It handles basic user authentication and persists sessions in local storage.
+
+## Directions for Running
+1. Run `bundle install` to install the gems.
+2. Run `rake db:setup` to setup the database.
+3. Run `npm install` to install node modules.
+4. Run `webpack` to generate bundle file.
+5. Run `webpack --w` and `rails s` to start server and listen for changes.
+6. Open application at `localhost:3000`
+
+## Project Setup Checklist
 Here's a Rails/React/Redux setup checklist.
 
 * [ ] `rails new`
@@ -23,13 +35,22 @@ Here's a Rails/React/Redux setup checklist.
   * `webpack`
   * `react`
   * `react-dom`
-  * `react-router`
+  * `react-router` <-- might not be needed if using history and react-router-dom
   * `redux`
   * `react-redux`
   * `babel-core`
   * `babel-loader`
   * `babel-preset-react`
   * `babel-preset-es2015`
+  * `babel-preset-stage-1`
+  * `react-modal`
+  * `classnames`
+  * `react-loading-animation`
+  * `react-router-dom`
+  * `redux-thunk`
+  * `history`
+  * `lodash`
+  * `redux-form` <-- optional
 * [ ] Create a `webpack.config.js` file.
   * The entry point should be in frontend, e.g. `entry: 'frontend/index.jsx'`.
   * The output path should be `'app/assets/javascripts'`.
@@ -41,7 +62,7 @@ Here's a Rails/React/Redux setup checklist.
   * `git push` your skeleton.
 
 
-# Rails Setup
+## Rails Setup
 
 There are several things you **must** do when beginning every Rails
 app for the near future.
@@ -74,7 +95,7 @@ using the following command:
 rails _4.2.7_ new MyProjectName --database=postgresql --skip-turbolinks
 ```
 
-## Use Common Debugging Gems
+### Use Common Debugging Gems
 
 You want to use `better_errors` and `binding_of_caller`, which will
 make it much easier to see what is going on in your Rails app. You

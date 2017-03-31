@@ -29,6 +29,10 @@ class User < ActiveRecord::Base
     self.session_token
   end
 
+  def self.serialize(user)
+    {username: user.username, id: user.id}
+  end
+
   private
   def ensure_session_token
     self.session_token ||= SecureRandom.urlsafe_base64(16)

@@ -6,6 +6,11 @@ class User < ActiveRecord::Base
 
   attr_reader :password
 
+  has_many :chatroom_members
+  has_many :messages
+  has_many :chatrooms, through: :chatroom_members
+  has_many :users, through: :chatroom_members
+
   after_initialize :ensure_session_token
 
   def self.find_by_credentials(username, password)
@@ -29,8 +34,28 @@ class User < ActiveRecord::Base
     self.session_token
   end
 
-  def self.serialize(user)
-    {username: user.username, id: user.id}
+  # Returns an object with the following structure
+  # {:username=>"travis",
+  #  :id=>1,
+  #  :chatrooms=>
+  #   [{ :name=>"Chatroom 1"
+  #      :users=>{1=>"travis", 2=>"leo"},
+  #      :messages=>
+  #        [ {:user_id=>1,
+  #           :body=>"hello Leo",
+  #           :created_at=>Mon, 03 Apr 2017 19:43:13 UTC +00:00},
+  #           .
+  #           .
+  #           .
+  #          {:user_id=>1,
+  #           :body=>"eating and coding as usual",
+  #           :created_at=>Mon, 03 Apr 2017 19:48:13 UTC +00:00} ]
+  #   }]
+  # }
+  def serialize
+    user = User.includes(:chatrooms).includes(:chatroom_members).includes(:messages).includes(:users).find_by(id: self.id)
+    user_chatrooms = self.chatrooms.map { |chatroom| chatroom.serialize }
+    {username: self.username, id: self.id, chatrooms: user_chatrooms }
   end
 
   private

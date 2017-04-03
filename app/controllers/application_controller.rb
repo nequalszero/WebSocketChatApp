@@ -18,4 +18,8 @@ class ApplicationController < ActionController::Base
     current_user.try(:reset_session_token!)
     session[:session_token] = nil
   end
+
+  def require_logged_in
+    render json: ['You must be logged in to do that.'], status: 401 unless current_user
+  end
 end

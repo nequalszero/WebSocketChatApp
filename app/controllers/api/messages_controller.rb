@@ -14,7 +14,7 @@ class Api::MessagesController < ApplicationController
 
   def update
     @message = Message.find(params[:id])
-    validate_message_ownership(@message)
+    validate_ownership(@message)
 
     if @message.update(new_message_params)
       render json: @message
@@ -36,7 +36,8 @@ class Api::MessagesController < ApplicationController
     render json: ["Access forbidden"], status: 403 unless ChatroomMember.find_chatroom_member(current_user.id, params[:chatroom_id])
   end
 
-  def validate_message_ownership(message)
-    render json: ["Access forbidden"], status: 403 unless message.user_id == current_user.id
+  def validate_ownership(message)
+    render json: ["Access forbidden - unauthorized"], status: 403 unless message.user_id == current_user.id
+    render json: ["Access forbidden - incorrect chatroom"], status: 422 unless message.chatroom_id == params[:chatroom_id]
   end
 end

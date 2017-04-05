@@ -9,7 +9,7 @@ class ChatroomMember < ActiveRecord::Base
     ChatroomMember.find_by({user_id: user_id, chatroom_id: chatroom_id})
   end
 
-  def self.serialize(chatroom_member)
-    { chatroom_id: chatroom_member.id, user_id: chatroom_member.user_id }
+  def serialize
+    { chatroom_id: self.id, user_id: self.user_id, id: id }
   end
 end

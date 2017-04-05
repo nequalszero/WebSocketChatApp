@@ -1,4 +1,4 @@
-class ChatroomMembersController < ApplicationController
+class Api::ChatroomMembersController < ApplicationController
   before_action :require_logged_in, only: [:create, :destroy]
 
   def create
@@ -12,9 +12,9 @@ class ChatroomMembersController < ApplicationController
   end
 
   def destroy
-    @chatroom_member = ChatroomMember.find_by(chatroom_member_params)
+    @chatroom_member = ChatroomMember.find_by(paramd[:id])
 
-    if @chatroom_member
+    if @chatroom_member && validate_ownership
       @chatroom_member.delete
       render json: @chatroom_member
     else
@@ -28,5 +28,9 @@ class ChatroomMembersController < ApplicationController
     { user_id: current_user.id, chatroom_id: params[:chatroom_id] }
   end
 
-  def
+  # Ensure current_user.id matches @chatroom_member.user_id
+  def validate_ownership
+    render json: ["Unauthorized action"], status: 403 unless current_user.id == @chatroom_member.id
+    true
+  end
 end

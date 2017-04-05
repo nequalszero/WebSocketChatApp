@@ -1,6 +1,6 @@
 <script id="bootstrap-current-user" type="text/javascript">
   <% if current_user %>
-  	window.localStorage.setItem("currentUser", JSON.stringify( <%= User.serialize(current_user).to_json.html_safe %>))
+  	window.localStorage.setItem("currentUser", JSON.stringify( <%= current_user.serialize.to_json.html_safe %>))
   <% else %>
     window.localStorage.setItem("currentUser", JSON.stringify(""))
   <% end %>

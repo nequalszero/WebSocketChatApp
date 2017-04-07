@@ -10,9 +10,9 @@
 #  updated_at      :datetime         not null
 #
 
-FactoryGirl.define do
-  factory :user do
-    username "leo"
-    password "password"
-  end
-end
+# FactoryGirl.define do
+#   factory :user do
+#     username "leo"
+#     password "password"
+#   end
+# end

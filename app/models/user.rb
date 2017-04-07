@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :integer          not null, primary key
+#  username        :string           not null
+#  password_digest :string           not null
+#  session_token   :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
+
 class User < ActiveRecord::Base
   validates :username, :password_digest, :session_token, presence: true
   validates :username, uniqueness: true
@@ -34,6 +46,10 @@ class User < ActiveRecord::Base
     self.session_token
   end
 
+  def serialize
+    {username: self.username, id: self.id}
+  end
+
   # Returns an object with the following structure
   # {:username=>"travis",
   #  :id=>1,
@@ -52,9 +68,9 @@ class User < ActiveRecord::Base
   #           :created_at=>Mon, 03 Apr 2017 19:48:13 UTC +00:00} ]
   #   }]
   # }
-  def serialize
+  def serialize_current_user
     user = User.includes(:chatrooms).includes(:chatroom_members).includes(:messages).includes(:users).find_by(id: self.id)
-    user_chatrooms = self.chatrooms.map { |chatroom| chatroom.serialize }
+    user_chatrooms = self.chatrooms.map { |chatroom| chatroom.serialize_for_current_user }
     {username: self.username, id: self.id, chatrooms: user_chatrooms }
   end
 

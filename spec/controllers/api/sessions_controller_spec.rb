@@ -10,9 +10,7 @@ RSpec.describe Api::SessionsController, type: :controller do
 
   before(:all) do
     DatabaseCleaner.clean
-    puts "Session controller: After delete: #{User.count} entries in database"
     User.create!(valid_user)
-    puts "After create: #{User.count} entries in database"
   end
 
   describe "with valid_params" do
@@ -22,7 +20,8 @@ RSpec.describe Api::SessionsController, type: :controller do
     end
 
     let(:user) { User.find_by_username(new_username) }
-    let(:expected_response) { {username: user.username, id: user.id, chatrooms: []}.to_json }
+    let(:expected_create_response) { {username: user.username, id: user.id, chatrooms: []}.to_json }
+    let(:expected_destroy_response) { {username: user.username, id: user.id}.to_json }
 
     context "creating a session" do
       it "responds with a successful status code" do
@@ -31,7 +30,7 @@ RSpec.describe Api::SessionsController, type: :controller do
       end
 
       it "gives the expected response" do
-        expect(response.body).to eq(expected_response)
+        expect(response.body).to eq(expected_create_response)
       end
 
       it "assigns a session_token to the database and cookie" do
@@ -49,7 +48,7 @@ RSpec.describe Api::SessionsController, type: :controller do
       end
 
       it "gives the expected response" do
-        expect(response.body).to eq(expected_response)
+        expect(response.body).to eq(expected_destroy_response)
       end
 
       it "clears the session_token in the client's cookie" do

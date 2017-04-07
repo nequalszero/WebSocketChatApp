@@ -7,7 +7,7 @@ class Api::SessionsController < ApplicationController
 
     if @user
       sign_in(@user)
-      render json: @user.serialize
+      render json: @user.serialize_current_user
     else
       render(
         json: ["Invalid username/password combination"],

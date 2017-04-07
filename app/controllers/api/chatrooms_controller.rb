@@ -1,6 +1,10 @@
 class Api::ChatroomsController < ApplicationController
   before_action :require_logged_in, only: [:create]
 
+  def index
+    render json: Chatroom.all_chatrooms_with_messages_and_users
+  end
+
   def create
     @chatroom = Chatroom.new(chatroom_params)
 

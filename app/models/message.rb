@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: messages
+#
+#  id          :integer          not null, primary key
+#  user_id     :integer          not null
+#  chatroom_id :integer          not null
+#  body        :text             not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
+
 class Message < ActiveRecord::Base
   validates :user_id, :chatroom_id, :body, presence: true
   validates :body, length: {minimum: 1}

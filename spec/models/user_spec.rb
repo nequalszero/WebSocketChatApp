@@ -19,17 +19,21 @@ RSpec.describe User, type: :model do
 
   before(:all) do
     DatabaseCleaner.clean
-    puts "User model: After delete: #{User.count} entries in database"
 
     User.create!({username: test_username, password: test_password})
-    puts "User model after create: #{User.count} entries in database"
   end
-  
+
   let(:new_user) { User.new(username: "new", password: "password") }
+
+  describe "associations" do
+    it { should have_many(:chatroom_members) }
+    it { should have_many(:messages) }
+    it { should have_many(:chatrooms) }
+    it { should have_many(:users) }
+  end
 
   describe "password validation" do
     it "does not accept blank passwords" do
-      puts "running first user model test"
       new_user.password = ""
       expect(new_user).not_to be_valid
     end
@@ -85,6 +89,4 @@ RSpec.describe User, type: :model do
       expect(user.class).not_to eq(User)
     end
   end
-
-  # DatabaseCleaner.clean
 end

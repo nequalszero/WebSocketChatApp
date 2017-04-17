@@ -17,11 +17,11 @@ class ChatroomMember < ActiveRecord::Base
   belongs_to :chatroom
   belongs_to :user
 
-  def find_chatroom_member(user_id, chatroom_id)
+  def self.find_chatroom_member(user_id, chatroom_id)
     ChatroomMember.find_by({user_id: user_id, chatroom_id: chatroom_id})
   end
 
   def serialize
-    { chatroom_id: self.id, user_id: self.user_id, id: id }
+    { chatroom_id: self.chatroom_id, user_id: self.user_id, id: self.id }
   end
 end

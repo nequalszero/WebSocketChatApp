@@ -7,7 +7,7 @@ module Api::SessionsHelper
    	session[:session_token] = user.reset_session_token!
  	end
 
- 	def destroy_session(user)
+ 	def destroy_session
     current_user.try(:reset_session_token!)
     session[:session_token] = nil
  	end

@@ -1,62 +1,98 @@
 require 'rails_helper'
 
 RSpec.describe Api::UsersController, type: :controller do
-  before(:all) do
-    DatabaseCleaner.clean
-  end
+  describe "creating a user" do
+    context "with valid params" do
+      before(:each) do
+        post :create, user: { username: "new_username", password: "password" }
+      end
 
-  context "with valid params" do
-    it "validates user with valid parameters" do
-      post :create, user: { username: "new_username", password: "password" }
-      user = User.find_by_username("new_username")
-      expected_response = {username: user.username, id: user.id, chatrooms: []}.to_json
+      let(:user) { User.find_by_username("new_username") }
+      let(:expected_response) { {username: user.username, id: user.id, chatrooms: []}.to_json }
 
-      expect(response).to have_http_status(200)
-      expect(response.body).to eq(expected_response)
-    end
-  end
+      it "reponds with a successful status code" do
+        expect(response).to have_http_status(200)
+      end
 
-  context "with invalid params" do
-    it "validates that username and password cannot be blank" do
-      post :create, user: { username: "", password: ""}
-      expect(response).to have_http_status(422)
+      it "renders a JSON object with the correct information" do
+        expect(user).not_to eq(nil)
+        expect(response.body).to eq(expected_response)
+      end
     end
 
-    it "validates the presence of a username" do
-      post :create, user: { password: "password" }
-      expect(response).to have_http_status(422)
+    context "with invalid params" do
+      describe "validates the presence of a username" do
+        before(:each) do
+          post :create, user: { password: "password" }
+        end
+
+        it "responds with a 422 status code" do
+          expect(response).to have_http_status(422)
+        end
+
+        it "states that the username field cannot be blank" do
+          expect(response.body).to include("Username can't be blank")
+        end
+      end
+
+      describe "validates that usernames must be at least 3 characters" do
+        before(:each) do
+          post :create, user: { username: "pi" , password: "password"}
+        end
+
+        it "responds with a 422 status code" do
+          expect(response).to have_http_status(422)
+        end
+
+        it "states that usernames must be at least 3 characters" do
+          expect(response.body).to include("Username is too short (minimum is 3 characters)")
+        end
+      end
+
+      describe "validates that usernames must be unique" do
+        before(:each) do
+          create(:user, username: "unique_username")
+          post :create, user: { username: "unique_username" , password: "something"}
+        end
+
+        it "responds with a 422 status code" do
+          expect(response).to have_http_status(422)
+        end
+
+        it "states that the password field cannot be blank" do
+          expect(response.body).to include("Username has already been taken")
+        end
+      end
+
+      describe "validates the presence of a password" do
+        before(:each) do
+          post :create, user: { username: "test" }
+        end
+
+        it "responds with a 422 status code" do
+          expect(response).to have_http_status(422)
+        end
+
+        it "states that the password field cannot be blank" do
+          expect(response.body).to include("Password digest can't be blank")
+        end
+      end
+
+      describe "validates that passwords must be at least 6 characters" do
+        before(:each) do
+          post :create, user: { username: "test", password: "short"}
+        end
+
+        it "responds with a 422 status code" do
+          expect(response).to have_http_status(422)
+        end
+
+        it "states that passwords must be at least 6 characters" do
+          expect(response.body).to include("Password is too short (minimum is 6 characters)")
+        end
+      end
     end
 
-    it "validates that usernames cannot be blank" do
-      post :create, user: { username: "", password: "password"}
-      expect(response).to have_http_status(422)
-    end
-
-    it "validates that usernames must be at least 3 characters" do
-      post :create, user: { username: "pi" , password: "password"}
-      expect(response).to have_http_status(422)
-    end
-
-    it "validates that usernames must be unique" do
-      User.create(username: "unique_username", password: "password")
-      post :create, user: { username: "unique_username" , password: "something"}
-      expect(response).to have_http_status(422)
-    end
-
-    it "validates the presence of a password" do
-      post :create, user: { username: "test" }
-      expect(response).to have_http_status(422)
-    end
-
-    it "validates that passwords cannot be blank" do
-      post :create, user: { username: "test", password: ""}
-      expect(response).to have_http_status(422)
-    end
-
-    it "validates that passwords must be at least 6 characters" do
-      post :create, user: { username: "test", password: "short"}
-      expect(response).to have_http_status(422)
-    end
   end
 
   context "strong parameters" do

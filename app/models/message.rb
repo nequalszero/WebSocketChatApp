@@ -18,6 +18,12 @@ class Message < ActiveRecord::Base
   belongs_to :chatroom
 
   def serialize
-    {user_id: self.user_id, body: self.body, created_at: self.created_at}
+    {
+      user_id: self.user_id,
+      chatroom_id: self.chatroom_id,
+      body: self.body,
+      created_at: self.created_at.to_formatted_s,
+      id: self.id
+    }
   end
 end

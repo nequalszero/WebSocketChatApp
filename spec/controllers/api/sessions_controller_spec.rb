@@ -1,53 +1,70 @@
 require 'rails_helper'
 
 RSpec.describe Api::SessionsController, type: :controller do
-  # Clear out the test database
+  describe "creating a session" do
+    let(:user_credentials) { attributes_for(:user, {username: "new_user", password: "password"}) }
+    let!(:user) { create(:user, user_credentials) }
 
-  # Create a user
-  new_username = "new_user"
-  new_password = "password"
-  valid_user = { username: new_username, password: new_password }
+    context "with valid params" do
+      before(:each) do
+        post :create, user: user_credentials
+      end
 
-  before(:all) do
-    DatabaseCleaner.clean
-    User.create!(valid_user)
+      after(:each) do
+        delete :destroy
+      end
+
+      it "responds with a successful status code" do
+        expect(response).to have_http_status(200)
+      end
+
+      it "successfully logs in the user" do
+        expect(current_user.id).to eq(user.id)
+      end
+
+      it "gives the expected response" do
+        expected_response = {username: user.username, id: user.id, chatrooms: []}.to_json
+        expect(response.body).to eq(expected_response)
+      end
+
+      it "assigns a new session_token to the database and cookie" do
+        expect(session[:session_token]).to eq(current_user.session_token)
+      end
+    end
+
+    context "with invalid params" do
+      before(:each) do
+        user_credentials[:password] = "wrong password"
+        post :create, user: user_credentials
+      end
+
+      it "responds with a 401 status code" do
+        expect(response).to have_http_status(401)
+      end
+
+      it "states that the username/password combination is invalid" do
+        expect(response.body).to include("Invalid username/password combination")
+      end
+    end
   end
 
-  describe "with valid_params" do
-    before(:each) do
-      post :create, user: valid_user
-      puts "creating valid user"
-    end
+  describe "destroying a session" do
+    context "when there is an active session" do
+      let(:user_credentials) { attributes_for(:user, {username: "new_user", password: "password"}) }
+      let!(:user) { create(:user, user_credentials) }
 
-    let(:user) { User.find_by_username(new_username) }
-    let(:expected_create_response) { {username: user.username, id: user.id, chatrooms: []}.to_json }
-    let(:expected_destroy_response) { {username: user.username, id: user.id}.to_json }
-
-    context "creating a session" do
-      it "responds with a successful status code" do
-        puts "running first session controller test"
-        expect(response).to have_http_status(200)
-      end
-
-      it "gives the expected response" do
-        expect(response.body).to eq(expected_create_response)
-      end
-
-      it "assigns a session_token to the database and cookie" do
-        expect(session[:session_token]).to eq(user.session_token)
-      end
-    end
-
-    context "destroying a session" do
       before(:each) do
-        post :destroy
+        post :create, user: user_credentials
+        delete :destroy
       end
 
-      it "successfully logs out user" do
+      it "successfully logs out current user" do
         expect(response).to have_http_status(200)
+        expect(current_user).to eq(nil)
       end
 
       it "gives the expected response" do
+        expected_destroy_response = {username: user.username, id: user.id}.to_json
         expect(response.body).to eq(expected_destroy_response)
       end
 
@@ -56,27 +73,20 @@ RSpec.describe Api::SessionsController, type: :controller do
       end
 
       it "resets the session_token in the database" do
-        post :create, user: valid_user
-        old_session_token = User.find_by_username(new_username).session_token
-        post :destroy
-        new_session_token = User.find_by_username(new_username).session_token
+        post :create, user: user_credentials
+        old_session_token = User.find(user.id).session_token
+        delete :destroy
+        new_session_token = User.find(user.id).session_token
         expect(new_session_token).not_to eq(old_session_token)
       end
     end
-  end
 
-  describe "with invalid params" do
-    context "creating a session" do
-      it "responds with a 401 status code" do
-        post :create, user: { username: new_username, password: "wrong_password"}
-        expect(response).to have_http_status(401)
+    context "when there is no active session" do
+      before(:each) do
+        delete :destroy
       end
-    end
-    context "destroying a session" do
-      it "responds with a 404 status code" do
-        post :destroy
-        expect(response).to have_http_status(404)
-      end
+
+      include_examples 'require logged in'
     end
   end
 end

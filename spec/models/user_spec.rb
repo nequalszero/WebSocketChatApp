@@ -13,17 +13,8 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  # shoulda_matcher validate_uniqueness_of requires at least one database entry
-  test_username = "test_user"
-  test_password = "password"
-
-  before(:all) do
-    DatabaseCleaner.clean
-
-    User.create!({username: test_username, password: test_password})
-  end
-
-  let(:new_user) { User.new(username: "new", password: "password") }
+  let!(:user_credentials) { attributes_for(:user, {username: "new", password: "password"}) }
+  let!(:new_user) { build(:user, user_credentials) }
 
   describe "associations" do
     it { should have_many(:chatroom_members) }
@@ -60,33 +51,39 @@ RSpec.describe User, type: :model do
 
     it { should validate_presence_of(:username) }
     it { should validate_presence_of(:password_digest) }
-    it { should validate_uniqueness_of(:username) }
+    it do
+      create(:user)
+      should validate_uniqueness_of(:username)
+    end
   end
 
   describe "password encryption" do
     it "does not save passwords to the database" do
-      User.create!(username: "leo", password: "asdfasdf")
-      user = User.find_by_username("leo")
-      expect(user.password).not_to be("asdfasdf")
+      create(:user, user_credentials)
+      user = User.find_by_username(user_credentials[:username])
+      expect(user.password).not_to be(user_credentials[:password])
     end
 
     it "encrypts the password using BCrypt" do
       expect(BCrypt::Password).to receive(:create)
-      User.new(username: "leo", password: "asdfasdf")
+      build(:user, user_credentials)
     end
   end
 
-  describe "User#find_by_username_and_credentials" do
-    it "returns a user when given valid credentials" do
-      user = User.find_by_credentials(test_username, test_password)
-      expect(user.class).not_to eq(NilClass)
+  describe "User::find_by_username_and_credentials" do
+    before(:each) do
+      create(:user, user_credentials)
+    end
+
+    it "returns the correct user when given valid credentials" do
+      user = User.find_by_credentials(user_credentials[:username], user_credentials[:password])
       expect(user.class).to eq(User)
+      expect(user.username).to eq(user_credentials[:username])
     end
 
     it "returns nil when given invalid credentials" do
-      user = User.find_by_credentials(test_username, "wrong_password")
+      user = User.find_by_credentials(user_credentials[:username], "wrong_password")
       expect(user.class).to eq(NilClass)
-      expect(user.class).not_to eq(User)
     end
   end
 end

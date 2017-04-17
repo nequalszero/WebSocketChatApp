@@ -31,6 +31,11 @@ class User < ActiveRecord::Base
     user
   end
 
+  # Gets all chatrooms
+  def non_user_chatrooms
+    Chatroom.non_user_chatrooms(self)
+  end
+
   def valid_password?(password)
     BCrypt::Password.new(self.password_digest).is_password?(password)
   end
@@ -69,8 +74,12 @@ class User < ActiveRecord::Base
   #   }]
   # }
   def serialize_current_user
-    user = User.includes(:chatrooms).includes(:chatroom_members).includes(:messages).includes(:users).find_by(id: self.id)
-    user_chatrooms = self.chatrooms.map { |chatroom| chatroom.serialize_for_current_user }
+    user = User.includes(:chatrooms)
+               .includes(:chatroom_members)
+               .includes(:messages)
+               .includes(:users)
+               .find_by(id: self.id)
+    user_chatrooms = self.chatrooms.map { |chatroom| chatroom.serialize_for_current_user(user) }
     {username: self.username, id: self.id, chatrooms: user_chatrooms }
   end
 

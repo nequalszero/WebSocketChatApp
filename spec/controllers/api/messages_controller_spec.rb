@@ -21,8 +21,6 @@ RSpec.describe Api::MessagesController, type: :controller do
   let!(:member1) { create(:chatroom_member, {user_id: user1.id, chatroom_id: chat1.id}) }
   let!(:member2) { create(:chatroom_member, {user_id: user2.id, chatroom_id: chat1.id}) }
 
-  let!(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
-
   context "when no user is logged in" do
     describe "index method" do
       before(:each) do
@@ -49,7 +47,7 @@ RSpec.describe Api::MessagesController, type: :controller do
     end
   end
 
-  context "when the user does not belong to the chatroom" do
+  context "when the logged in user does not belong to the chatroom" do
     let!(:user3) { create(:user, username: "User 3") }
 
     before(:each) do
@@ -62,7 +60,7 @@ RSpec.describe Api::MessagesController, type: :controller do
 
     describe "index method" do
       before(:each) do
-        get :index, {chatroom_id: 1}
+        get :index, {chatroom_id: chat1.id}
       end
 
       include_examples "verify chatroom membership"
@@ -70,7 +68,7 @@ RSpec.describe Api::MessagesController, type: :controller do
 
     describe "create method" do
       before(:each) do
-        get :index, {chatroom_id: 1}
+        post :create, {chatroom_id: chat1.id}
       end
 
       include_examples "verify chatroom membership"
@@ -78,26 +76,51 @@ RSpec.describe Api::MessagesController, type: :controller do
 
     describe "update method" do
       before(:each) do
-        get :index, {chatroom_id: 1}
+        patch :update, {chatroom_id: chat1.id}
       end
 
       include_examples "verify chatroom membership"
     end
   end
 
-  # context "when a user is logged in" do
-  #   before(:each) do
-  #     create_session(user1)
-  #   end
-  #
-  #   after(:each) do
-  #     destroy_session
-  #   end
-  #
-  #   describe "index method" do
-  #
-  #   end
-  # end
+  context "index method" do
+    let!(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
+    let!(:message2) { create(:message, {user_id: user2.id, chatroom_id: chat1.id}) }
+
+    before(:each) do
+      create_session(user1)
+      get :index, chatroom_id: chat1.id
+    end
+
+    after(:each) do
+      destroy_session
+    end
+
+    it "responds with a successful status code" do
+      expect(response).to have_http_status(200)
+    end
+
+    it "gives the expected response" do
+      expected_response = [
+        {
+          user_id: message1.user_id,
+          chatroom_id: message1.chatroom_id,
+          body: message1.body,
+          created_at: message1.created_at.to_formatted_s,
+          id: message1.id
+        },
+        {
+          user_id: message2.user_id,
+          chatroom_id: message2.chatroom_id,
+          body: message2.body,
+          created_at: message2.created_at.to_formatted_s,
+          id: message2.id
+        }
+      ].to_json
+
+      expect(response.body).to eq(expected_response)
+    end
+  end
 
   # context "strong parameters" do
   #   before(:each) do

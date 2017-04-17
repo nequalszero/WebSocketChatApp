@@ -39,6 +39,8 @@ RSpec.describe Api::MessagesController, type: :controller do
     end
 
     describe "update method" do
+      let(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
+
       before(:each) do
         patch :update, {id: message1.id, chatroom_id: chat1.id, message: {body: "this should not work"}}
       end
@@ -75,8 +77,10 @@ RSpec.describe Api::MessagesController, type: :controller do
     end
 
     describe "update method" do
+      let(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
+
       before(:each) do
-        patch :update, {chatroom_id: chat1.id}
+        patch :update, {chatroom_id: chat1.id, id: message1.id}
       end
 
       include_examples "verify chatroom membership"

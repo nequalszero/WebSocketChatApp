@@ -12,15 +12,15 @@ class Api::ChatroomMembersController < ApplicationController
   end
 
   def destroy
-    @chatroom_member = ChatroomMember.find_by(paramd[:id])
+    @chatroom_member = ChatroomMember.find_by(id: params[:id])
 
-    if @chatroom_member && validate_ownership
+    if @chatroom_member
+      validate_ownership; return if performed?
       @chatroom_member.delete
       render json: @chatroom_member
     else
-      render json: ["Not a member of this chatroom"], status: 422
+      render json: ["Unprocessible entity - chatroom member with id #{params[:id]} does not exist"], status: 422
     end
-
   end
 
   private
@@ -30,7 +30,6 @@ class Api::ChatroomMembersController < ApplicationController
 
   # Ensure current_user.id matches @chatroom_member.user_id
   def validate_ownership
-    render json: ["Unauthorized action"], status: 403 unless current_user.id == @chatroom_member.id
-    true
+    render json: ["Unauthorized action - current user is not the chatroom member"], status: 403 unless current_user.id == @chatroom_member.id
   end
 end

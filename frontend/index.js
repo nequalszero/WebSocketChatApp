@@ -11,16 +11,19 @@ import { defaultState } from './lib/session_helper';
 import merge from 'lodash/merge';
 
 // root.html.erb file will initialize localStorage key currentUser to be "" if there is no current user.
-// if there is a current user, the currentUser key will have an object with the form:
+// If there is a current user, the currentUser key will have an object with the form:
 //  {username: String, id: Integer, chatrooms: Array}
+// Similarly the otherChatrooms key will be "" if there is no currentUser, else it will be an array
 const initializeStore = () => {
   if (window.localStorage.currentUser && JSON.parse(window.localStorage.currentUser)) {
     const { username, id, chatrooms } = JSON.parse(window.localStorage.currentUser);
     const currentUser = { username, id };
+    const otherChatrooms = JSON.parse(window.localStorage.otherChatrooms);
 
     const preloadedState = {
       session: Object.assign({}, defaultState, { currentUser: currentUser }),
-      chatrooms
+      // userChatrooms: chatrooms,
+      // otherChatrooms
     };
 
     return configureStore(preloadedState);

@@ -18,7 +18,7 @@ class Api::MessagesController < ApplicationController
   end
 
   def update
-    @message = Message.find(params[:id])
+    # @message = Message.find(params[:id])
     validate_message_ownership; return if performed?
 
     if @message.update(message_params)
@@ -38,7 +38,7 @@ class Api::MessagesController < ApplicationController
   end
 
   def get_chatroom_messages
-    ChatroomMember.find_chatroom_member(current_user.id, params[:chatroom_id]).chatroom.messages
+    @chatroom_member.chatroom.messages
   end
 
   def verify_chatroom_existance
@@ -47,13 +47,15 @@ class Api::MessagesController < ApplicationController
 
   def verify_logged_in_and_message_existance
     require_logged_in; return if performed?
-    render json: ["Unprocessible entity - Message id: #{params[:id]} does not exist"], status: 422 unless Message.exists?(params[:id])
+    @message = Message.find_by(id: params[:id])
+    render json: ["Unprocessible entity - Message id: #{params[:id]} does not exist"], status: 422 unless @message
   end
 
   def verify_chatroom_membership
     require_logged_in; return if performed?
     verify_chatroom_existance; return if performed?
-    render json: ["Access forbidden - no chatroom access"], status: 403 unless ChatroomMember.find_chatroom_member(current_user.id, params[:chatroom_id])
+    @chatroom_member = ChatroomMember.find_chatroom_member(current_user.id, params[:chatroom_id])
+    render json: ["Access forbidden - no chatroom access"], status: 403 unless @chatroom_member
   end
 
   def validate_message_ownership

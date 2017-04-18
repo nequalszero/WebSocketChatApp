@@ -17305,8 +17305,9 @@ var _merge2 = _interopRequireDefault(_merge);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // root.html.erb file will initialize localStorage key currentUser to be "" if there is no current user.
-// if there is a current user, the currentUser key will have an object with the form:
+// If there is a current user, the currentUser key will have an object with the form:
 //  {username: String, id: Integer, chatrooms: Array}
+// Similarly the otherChatrooms key will be "" if there is no currentUser, else it will be an array
 
 
 //Helpers
@@ -17318,10 +17319,10 @@ var initializeStore = function initializeStore() {
         chatrooms = _JSON$parse.chatrooms;
 
     var currentUser = { username: username, id: id };
+    var otherChatrooms = JSON.parse(window.localStorage.otherChatrooms);
 
     var preloadedState = {
-      session: Object.assign({}, _session_helper.defaultState, { currentUser: currentUser }),
-      chatrooms: chatrooms
+      session: Object.assign({}, _session_helper.defaultState, { currentUser: currentUser })
     };
 
     return (0, _store2.default)(preloadedState);

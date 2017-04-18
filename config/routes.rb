@@ -3,10 +3,10 @@ Rails.application.routes.draw do
     resources :users, only: [:create]
     resource :session, only: [:create, :destroy]
     resources :chatrooms, only: [:index, :create, :update]
-    resources :messages, only: [:index]
+    resources :messages, only: [:index, :update]
 
     resources :chatrooms do
-      resources :messages, only: [:create, :update]
+      resources :messages, only: [:create]
       resources :chatroom_members, only: [:index, :create, :destroy]
     end
   end

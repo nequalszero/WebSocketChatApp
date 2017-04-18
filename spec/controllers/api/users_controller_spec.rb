@@ -107,7 +107,7 @@ RSpec.describe Api::UsersController, type: :controller do
 
     it "should only permit username and password" do
       params = {user: { username: "hacker", password: "password", password_digest: "abc123", session_token: "apples" }}
-      should permit(:username, :password).for(:create, params: params)
+      should permit(:username, :password).for(:create, params: params).on(:user)
     end
   end
 end

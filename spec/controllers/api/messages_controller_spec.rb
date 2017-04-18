@@ -52,14 +52,14 @@ RSpec.describe Api::MessagesController, type: :controller do
       let(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
 
       before(:each) do
-        patch :update, {id: message1.id, chatroom_id: chat1.id, message: {body: "this should not work"}}
+        patch :update, {id: message1.id, message: {body: "this should not work"}}
       end
 
       include_examples 'require logged in'
     end
   end
 
-  context "when the chatroom requested does not exist" do
+  context "when the requested chatroom does not exist" do
     describe "index method" do
       before(:each) do
         create_session(user1)
@@ -85,24 +85,9 @@ RSpec.describe Api::MessagesController, type: :controller do
 
       include_examples 'verify chatroom existance'
     end
-
-    describe "update method" do
-      let(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
-
-      before(:each) do
-        create_session(user1)
-        patch :update, {id: message1.id, chatroom_id: 0, message: {body: "this should not work"}}
-      end
-
-      after(:each) do
-        destroy_session
-      end
-
-      include_examples 'verify chatroom existance'
-    end
   end
 
-  context "when the logged in user does not belong to the chatroom" do
+  context "when the logged in user does not belong to the requested chatroom" do
     let!(:user3) { create(:user, username: "User 3") }
 
     before(:each) do
@@ -124,16 +109,6 @@ RSpec.describe Api::MessagesController, type: :controller do
     describe "create method" do
       before(:each) do
         post :create, {chatroom_id: chat1.id}
-      end
-
-      include_examples "verify chatroom membership"
-    end
-
-    describe "update method" do
-      let(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
-
-      before(:each) do
-        patch :update, {chatroom_id: chat1.id, id: message1.id}
       end
 
       include_examples "verify chatroom membership"
@@ -179,19 +154,160 @@ RSpec.describe Api::MessagesController, type: :controller do
     end
   end
 
-  # context "strong parameters" do
-  #   before(:each) do
-  #     create_session(user1)
-  #   end
-  #
-  #   after(:each) do
-  #     destroy_session
-  #   end
-  #
-  #   it "should only permit body" do
-  #     params = {chatroom_id: chat1.id, message: { body: "hello" }}
-  #     should permit(:body, :user_id, :chatroom_id).for(:create, params: params)
-  #     should permit(:body, :user_id, :chatroom_id).for(:update, params: params)
-  #   end
-  # end
+  context "create method" do
+    before(:each) do
+      create_session(user1)
+    end
+
+    after(:each) do
+      destroy_session
+    end
+
+    describe "with valid parameters" do
+      let(:body) { "this should work" }
+
+      before(:each) do
+        post :create, {chatroom_id: chat1.id, message: {body: body}}
+      end
+
+      it "responds with a successful status code" do
+        expect(response).to have_http_status(200)
+      end
+
+      it "renders a serialized version of the message" do
+        message = Message.last
+        expect(message).not_to eq(nil)
+
+        expected_response = {
+          user_id: user1.id,
+          chatroom_id: chat1.id,
+          body: body,
+          created_at: message.created_at.to_formatted_s,
+          id: message.id
+        }.to_json
+
+        expect(response.body).to eq(expected_response)
+      end
+    end
+
+    describe "with invalid parameters" do
+      before(:each) do
+        post :create, {chatroom_id: chat1.id, message: {body: ""}}
+      end
+
+      it "responds with a 422 status code" do
+        expect(response).to have_http_status(422)
+      end
+
+      it "states that the body is too short" do
+        expect(response.body).to include("Body is too short (minimum is 1 character)")
+      end
+    end
+  end
+
+  context "update method" do
+    let(:body) { "initial message" }
+    let(:updated_body) { "updated message" }
+    let!(:message) { create(:message, {user_id: user1.id, chatroom_id: chat1.id, body: body})}
+
+    before(:each) do
+      create_session(user1)
+    end
+
+    after(:each) do
+      destroy_session
+    end
+
+    describe "with valid parameters" do
+      before(:each) do
+        patch :update, {id: message.id, message: {body: updated_body}}
+      end
+
+      it "responds with a successful status code" do
+        expect(response).to have_http_status(200)
+      end
+
+      it "renders a serialized version of the updated message" do
+        expected_response = {
+          user_id: user1.id,
+          chatroom_id: chat1.id,
+          body: updated_body,
+          created_at: message.created_at.to_formatted_s,
+          id: message.id
+        }.to_json
+
+        expect(response.body).to eq(expected_response)
+      end
+    end
+
+    describe "with invalid parameters" do
+      context "when the message does not exist" do
+        before(:each) do
+          patch :update, {id: 0, message: {body: ""}}
+        end
+
+        it "responds with a 422 status code" do
+          expect(response).to have_http_status(422)
+        end
+
+        it "states that the message does not exist" do
+          expect(response.body).to include("Unprocessible entity - Message id: 0 does not exist")
+        end
+      end
+
+      context "when the body is blank" do
+        before(:each) do
+          patch :update, {id: message.id, message: {body: ""}}
+        end
+
+        it "responds with a 422 status code" do
+          expect(response).to have_http_status(422)
+        end
+
+        it "states that the body is too short" do
+          expect(response.body).to include("Body is too short (minimum is 1 character)")
+        end
+      end
+
+      context "when the current user is not the original writer of the message" do
+        let(:user2_message) { create(:message, {chatroom_id: chat1.id, user_id: user2.id}) }
+
+        before(:each) do
+          patch :update, {id: user2_message.id, message: {body: "Should not update"}}
+        end
+
+        it "responds with a 403 status code" do
+          expect(response).to have_http_status(403)
+        end
+
+        it "states that the update is unauthorized" do
+          expected_error_message = "Access forbidden - unauthorized to update message with id: #{user2_message.id}"
+          expect(response.body).to include(expected_error_message)
+        end
+      end
+    end
+  end
+
+  context "strong parameters" do
+    before(:each) do
+      create_session(user1)
+    end
+
+    after(:each) do
+      destroy_session
+    end
+
+    it "should only permit body for creation" do
+      params = {chatroom_id: chat1.id, message: { body: "hello" }}
+
+      should permit(:body).for(:create, params: params).on(:message)
+    end
+
+    it "should only permit body for updating" do
+      message = create(:message, {user_id: user1.id, chatroom_id: chat1.id})
+      params = {id: message.id, message: { body: "hello", user_id: user2.id }}
+
+      should permit(:body).for(:update, params: params).on(:message)
+    end
+  end
 end

@@ -1,5 +1,6 @@
 class Api::MessagesController < ApplicationController
-  before_action :verify_chatroom_membership, only: [:index, :create, :update]
+  before_action :verify_chatroom_membership, only: [:index, :create]
+  before_action :verify_logged_in_and_message_existance, only: [:update]
 
   def index
     @messages = get_chatroom_messages()
@@ -20,7 +21,7 @@ class Api::MessagesController < ApplicationController
     @message = Message.find(params[:id])
     validate_message_ownership; return if performed?
 
-    if @message.update(new_message_params)
+    if @message.update(message_params)
       render json: @message.serialize
     else
       render json: @message.errors.full_messages, status: 422
@@ -44,6 +45,11 @@ class Api::MessagesController < ApplicationController
     render json: ["Unprocessible entity - chatroom does not exist"], status: 422 unless Chatroom.exists?(params[:chatroom_id])
   end
 
+  def verify_logged_in_and_message_existance
+    require_logged_in; return if performed?
+    render json: ["Unprocessible entity - Message id: #{params[:id]} does not exist"], status: 422 unless Message.exists?(params[:id])
+  end
+
   def verify_chatroom_membership
     require_logged_in; return if performed?
     verify_chatroom_existance; return if performed?
@@ -51,8 +57,6 @@ class Api::MessagesController < ApplicationController
   end
 
   def validate_message_ownership
-    render json: ["Access forbidden - unauthorized"], status: 403 unless @message.user_id == current_user.id
-    return if performed?
-    render json: ["Access forbidden - incorrect chatroom"], status: 422 unless @message.chatroom_id == params[:chatroom_id]
+    render json: ["Access forbidden - unauthorized to update message with id: #{params[:id]}"], status: 403 unless @message.user_id == current_user.id
   end
 end

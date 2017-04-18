@@ -10,6 +10,16 @@ shared_examples 'verify chatroom membership' do
   end
 end
 
+shared_examples 'verify chatroom existance' do
+  it 'responds with a 422 status code' do
+    expect(response).to have_http_status(422)
+  end
+
+  it 'states that the request chatroom does not exist' do
+    expect(response.body).to include('Unprocessible entity - chatroom does not exist')
+  end
+end
+
 RSpec.describe Api::MessagesController, type: :controller do
   let!(:user1_credentials) { attributes_for(:user, username: "User 1")}
   let!(:user2_credentials) { attributes_for(:user, username: "User 2")}
@@ -46,6 +56,49 @@ RSpec.describe Api::MessagesController, type: :controller do
       end
 
       include_examples 'require logged in'
+    end
+  end
+
+  context "when the chatroom requested does not exist" do
+    describe "index method" do
+      before(:each) do
+        create_session(user1)
+        get :index, chatroom_id: 0
+      end
+
+      after(:each) do
+        destroy_session
+      end
+
+      include_examples 'verify chatroom existance'
+    end
+
+    describe "create method" do
+      before(:each) do
+        create_session(user1)
+        post :create, {chatroom_id: 0, message: {body: "this should not work"}}
+      end
+
+      after(:each) do
+        destroy_session
+      end
+
+      include_examples 'verify chatroom existance'
+    end
+
+    describe "update method" do
+      let(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
+
+      before(:each) do
+        create_session(user1)
+        patch :update, {id: message1.id, chatroom_id: 0, message: {body: "this should not work"}}
+      end
+
+      after(:each) do
+        destroy_session
+      end
+
+      include_examples 'verify chatroom existance'
     end
   end
 
@@ -104,7 +157,7 @@ RSpec.describe Api::MessagesController, type: :controller do
       expect(response).to have_http_status(200)
     end
 
-    it "gives the expected response" do
+    it "renders a serialized version of the messages belonging to the chatroom" do
       expected_response = [
         {
           user_id: message1.user_id,

@@ -10,16 +10,6 @@ shared_examples 'verify chatroom membership' do
   end
 end
 
-shared_examples 'verify chatroom existance' do
-  it 'responds with a 422 status code' do
-    expect(response).to have_http_status(422)
-  end
-
-  it 'states that the request chatroom does not exist' do
-    expect(response.body).to include('Unprocessible entity - chatroom does not exist')
-  end
-end
-
 RSpec.describe Api::MessagesController, type: :controller do
   let!(:user1_credentials) { attributes_for(:user, username: "User 1")}
   let!(:user2_credentials) { attributes_for(:user, username: "User 2")}

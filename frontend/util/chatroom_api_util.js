@@ -5,10 +5,10 @@ export const createChatroomMember = (chatroomId) => {
   });
 };
 
-export const deleteChatroomMember = ({chatroomMemberId, chatroomId}) => {
+export const deleteChatroomMember = ({chatroomMemberId}) => {
   return $.ajax({
     method: 'DELETE',
-    url: `/api/chatrooms/${chatroomId}/chatroom_members/${chatroomMemberId}`
+    url: `/api/chatroom_members/${chatroomMemberId}`
   });
 };
 
@@ -28,10 +28,10 @@ export const createMessage = ({chatroomId, body}) => {
   })
 }
 
-export const updateMessage = ({chatroomId, messageId, body}) => {
+export const updateMessage = ({messageId, body}) => {
   return $.ajax({
     method: 'PATCH',
-    url: `api/chatrooms/${chatroomId}/messages/${messageId}`,
+    url: `api/messages/${messageId}`,
     data: {message: {body}}
   })
 }

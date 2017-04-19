@@ -1,6 +1,10 @@
 class Api::ChatroomMembersController < ApplicationController
-  before_action :verify_logged_in_and_chatroom_existance, only: [:create]
+  before_action :verify_logged_in_and_chatroom_existance, only: [:index, :create]
   before_action :require_logged_in, only: [:destroy]
+
+  def index
+    render json: @chatroom.chatroom_members.map(&:serialize)
+  end
 
   def create
     @chatroom_member = ChatroomMember.new(chatroom_member_params)
@@ -37,7 +41,8 @@ class Api::ChatroomMembersController < ApplicationController
 
   def verify_logged_in_and_chatroom_existance
     require_logged_in; return if performed?
-    render json: ["Unprocessible entity - chatroom does not exist"], status: 422 unless Chatroom.exists?(params[:chatroom_id])
+    @chatroom = Chatroom.includes(:chatroom_members).find_by(id: params[:chatroom_id])
+    render json: ["Unprocessible entity - chatroom does not exist"], status: 422 unless @chatroom
   end
 
   # Ensure current_user.id matches @chatroom_member.user_id

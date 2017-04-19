@@ -6,6 +6,14 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
   let!(:chat1) { create(:chatroom, name: "Chatroom 1") }
 
   context "when no user is logged in" do
+    describe "index method" do
+      before(:each) do
+        get :index, chatroom_id: chat1.id
+      end
+
+      include_examples 'require logged in'
+    end
+
     describe "create method" do
       before(:each) do
         post :create, chatroom_id: chat1.id
@@ -20,6 +28,74 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
       end
 
       include_examples 'require logged in'
+    end
+  end
+
+  context "when the requested chatroom does not exist" do
+    before(:each) do
+      create_session(user1)
+    end
+
+    after(:each) do
+      destroy_session
+    end
+
+    describe "index method" do
+      before(:each) do
+        get :index, {chatroom_id: 0}
+      end
+
+      include_examples "verify chatroom existance"
+    end
+
+    describe "create method" do
+      before(:each) do
+        post :create, {chatroom_id: 0}
+      end
+
+      include_examples "verify chatroom existance"
+    end
+  end
+
+  context "index method" do
+    let!(:member1) { create(:chatroom_member, user_id: user1.id, chatroom_id: chat1.id) }
+    let!(:member2) { create(:chatroom_member, user_id: user2.id, chatroom_id: chat1.id) }
+
+    before(:each) do
+      create_session(user1)
+    end
+
+    after(:each) do
+      destroy_session
+    end
+
+    describe "with valid parameters" do
+      before(:each) do
+        get :index, {chatroom_id: chat1.id}
+      end
+
+      it "responds with a successful status code" do
+        expect(response).to have_http_status(200)
+      end
+
+      it "responds with a serialized array of the chatroom's members" do
+        expected_response = [
+          {
+            chatroom_id: member1.chatroom_id,
+            user_id: member1.user_id,
+            id: member1.id,
+            has_left: false
+          },
+          {
+            chatroom_id: member2.chatroom_id,
+            user_id: member2.user_id,
+            id: member2.id,
+            has_left: false
+          }
+        ].to_json
+
+        expect(response.body).to eq(expected_response)
+      end
     end
   end
 
@@ -51,20 +127,6 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
         }.to_json
 
         expect(response.body).to eq(expected_response)
-      end
-    end
-
-    describe "when the requested chatroom does not exist" do
-      before(:each) do
-        post :create, {chatroom_id: 0}
-      end
-
-      it "responds with a 422 status code" do
-        expect(response).to have_http_status(422)
-      end
-
-      it "states that the chatroom does not exist" do
-        expect(response.body).to include('Unprocessible entity - chatroom does not exist')
       end
     end
 

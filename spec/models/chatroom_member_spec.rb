@@ -47,7 +47,8 @@ RSpec.describe ChatroomMember, type: :model do
       expected_result = {
         chatroom_id: chat1.id,
         user_id: leo.id,
-        id: member2.id
+        id: member2.id,
+        has_left: member2.has_left
       }
       result = member2.serialize
 

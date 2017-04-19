@@ -4,6 +4,7 @@ class CreateChatroomMembers < ActiveRecord::Migration
       t.references :user, index: true, foreign_key: true, null: false
       t.references :chatroom, index: true, foreign_key: true, null: false
       t.references :last_message_read, references: :messages
+      t.boolean :has_left, default: false
 
       t.index [:user_id, :chatroom_id], unique: true
       t.timestamps null: false

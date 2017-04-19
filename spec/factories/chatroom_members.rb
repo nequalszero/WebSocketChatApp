@@ -14,5 +14,6 @@ FactoryGirl.define do
   factory :chatroom_member do
     user_id 1
     chatroom_id 1
+    has_left false
   end
 end

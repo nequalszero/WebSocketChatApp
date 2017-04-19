@@ -11,8 +11,8 @@ leo = User.create(username: "leo", password: "asdfasdf")
 
 chat1 = Chatroom.create(name: "Chatroom 1")
 
-ChatroomMember.create(user_id: travis.id, chatroom_id: chat1.id)
-ChatroomMember.create(user_id: leo.id, chatroom_id: chat1.id)
+ChatroomMember.create!(user_id: travis.id, chatroom_id: chat1.id, has_left: false)
+ChatroomMember.create!(user_id: leo.id, chatroom_id: chat1.id, has_left: false)
 
 message = Message.create(user_id: travis.id, chatroom_id: chat1.id, body: "hello Leo")
 message.update(created_at: 10.minutes.ago)

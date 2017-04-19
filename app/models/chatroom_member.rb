@@ -22,6 +22,6 @@ class ChatroomMember < ActiveRecord::Base
   end
 
   def serialize
-    { chatroom_id: self.chatroom_id, user_id: self.user_id, id: self.id }
+    { chatroom_id: self.chatroom_id, user_id: self.user_id, id: self.id, has_left: self.has_left }
   end
 end

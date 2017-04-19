@@ -17,11 +17,12 @@ ActiveRecord::Schema.define(version: 20170401030729) do
   enable_extension "plpgsql"
 
   create_table "chatroom_members", force: :cascade do |t|
-    t.integer  "user_id",              null: false
-    t.integer  "chatroom_id",          null: false
+    t.integer  "user_id",                              null: false
+    t.integer  "chatroom_id",                          null: false
     t.integer  "last_message_read_id"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
+    t.boolean  "has_left",             default: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
 
   add_index "chatroom_members", ["chatroom_id"], name: "index_chatroom_members_on_chatroom_id", using: :btree
@@ -55,6 +56,7 @@ ActiveRecord::Schema.define(version: 20170401030729) do
     t.datetime "updated_at",      null: false
   end
 
+  add_index "users", ["session_token"], name: "index_users_on_session_token", using: :btree
   add_index "users", ["username"], name: "index_users_on_username", using: :btree
 
   add_foreign_key "chatroom_members", "chatrooms"

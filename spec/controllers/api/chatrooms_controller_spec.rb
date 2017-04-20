@@ -39,9 +39,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
         get :index
       end
 
-      it "responds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      include_examples "responds with a successful status code"
 
       it "does not retrieve chatrooms that the user is already a member of" do
         parsed_response = JSON.parse(response.body)
@@ -60,9 +58,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
         let(:chatroom) { Chatroom.find_by({name: "chatroom 1"}) }
         let(:chatroom_member) { ChatroomMember.find_by({user_id: user.id, chatroom_id: chatroom.id}) }
 
-        it "responds with a successful status code" do
-          expect(response).to have_http_status(200)
-        end
+        include_examples "responds with a successful status code"
 
         it "creates a chatroom in the database" do
           expect(chatroom).not_to eq(nil)
@@ -80,9 +76,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
             post :create, chatroom: { name: "chatroom 1" }
           end
 
-          it "should respond with a 422 status code" do
-            expect(response).to have_http_status(422)
-          end
+          include_examples "responds with a 422 status code"
 
           it "should state that the name has already been taken" do
             expect(response.body).to include("Name has already been taken")
@@ -94,9 +88,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
             post :create, chatroom: { name: nil }
           end
 
-          it "should respond with a 422 status code" do
-            expect(response).to have_http_status(422)
-          end
+          include_examples "responds with a 422 status code"
 
           it "should state that the name cannot be blank" do
             expect(response.body).to include("Name can't be blank")
@@ -107,10 +99,8 @@ RSpec.describe Api::ChatroomsController, type: :controller do
           before(:each) do
             post :create, chatroom: { name: "hi" }
           end
-
-          it "should respond with a 422 status code" do
-            expect(response).to have_http_status(422)
-          end
+          
+          include_examples "responds with a 422 status code"
 
           it "should state that the name is too short" do
             expect(response.body).to include("Name is too short (minimum is 3 characters)")

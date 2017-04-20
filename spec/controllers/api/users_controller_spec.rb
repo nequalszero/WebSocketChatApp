@@ -10,9 +10,7 @@ RSpec.describe Api::UsersController, type: :controller do
       let(:user) { User.find_by_username("new_username") }
       let(:expected_response) { {username: user.username, id: user.id, chatrooms: []}.to_json }
 
-      it "reponds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      include_examples "responds with a successful status code"
 
       it "renders a JSON object with the correct information" do
         expect(user).not_to eq(nil)
@@ -26,9 +24,7 @@ RSpec.describe Api::UsersController, type: :controller do
           post :create, user: { password: "password" }
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that the username field cannot be blank" do
           expect(response.body).to include("Username can't be blank")
@@ -40,9 +36,7 @@ RSpec.describe Api::UsersController, type: :controller do
           post :create, user: { username: "pi" , password: "password"}
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that usernames must be at least 3 characters" do
           expect(response.body).to include("Username is too short (minimum is 3 characters)")
@@ -55,9 +49,7 @@ RSpec.describe Api::UsersController, type: :controller do
           post :create, user: { username: "unique_username" , password: "something"}
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that the password field cannot be blank" do
           expect(response.body).to include("Username has already been taken")
@@ -69,9 +61,7 @@ RSpec.describe Api::UsersController, type: :controller do
           post :create, user: { username: "test" }
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that the password field cannot be blank" do
           expect(response.body).to include("Password digest can't be blank")
@@ -83,9 +73,7 @@ RSpec.describe Api::UsersController, type: :controller do
           post :create, user: { username: "test", password: "short"}
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that passwords must be at least 6 characters" do
           expect(response.body).to include("Password is too short (minimum is 6 characters)")

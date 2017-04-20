@@ -74,9 +74,7 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
         get :index, {chatroom_id: chat1.id}
       end
 
-      it "responds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      include_examples "responds with a successful status code"
 
       it "responds with a serialized array of the chatroom's members" do
         expected_response = [
@@ -109,39 +107,101 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
     end
 
     describe "with valid parameters" do
-      before(:each) do
-        post :create, {chatroom_id: chat1.id}
+      let(:expected_response) {
+        JSON.parse({
+          name: chat1.name,
+          users: {
+            user1.id => user1.username,
+            user2.id => user2.username
+          },
+          id: chat1.id,
+          membership_id: nil,
+          messages: []
+        }.to_json)
+      }
+
+      context "when the user has never been a part of the chatroom" do
+        before(:each) do |example|
+          unless example.metadata[:skip_before]
+            post :create, {chatroom_id: chat1.id}
+          end
+        end
+
+        include_examples "responds with a successful status code"
+
+        it "creates a new entry in the chatroom_members table", :skip_before do
+          old_count = ChatroomMember.count
+          post :create, {chatroom_id: chat1.id}
+
+          expect(Chatroom.count).to eq(old_count + 1)
+        end
+
+        it "saves the new chatroom_member with attribute has_left: false" do
+          chatroom_member = ChatroomMember.find_by({user_id: user1.id, chatroom_id: chat1.id})
+
+          expect(chatroom_member).not_to eq(nil)
+          expect(chatroom_member.has_left).to eq(false)
+        end
+
+        it "responds with a serialized version of the chatroom", :skip_before do
+          create(:chatroom_member, {user_id: user2.id, chatroom_id: chat1.id, has_left: true})
+          post :create, {chatroom_id: chat1.id}
+
+          chatroom_member = ChatroomMember.find_by({user_id: user1.id, chatroom_id: chat1.id})
+          expected_response["membership_id"] = chatroom_member.id
+
+          expect(JSON.parse(response.body)).to eq(expected_response)
+        end
       end
 
-      it "responds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      context "when the user was once a member of the chatroom" do
+        before(:each) do |example|
+          unless example.metadata[:skip_before]
+            create(:chatroom_member, {user_id: user1.id, chatroom_id: chat1.id, has_left: true})
+            post :create, {chatroom_id: chat1.id}
+          end
+        end
 
-      it "responds with a serialized version of the chatroom member, with has_left: false" do
-        chatroom_member = ChatroomMember.find_chatroom_member(user1.id, chat1.id)
-        expected_response = {
-          chatroom_id: chat1.id,
-          user_id: user1.id,
-          id: chatroom_member.id,
-          has_left: false
-        }.to_json
+        include_examples "responds with a successful status code"
 
-        expect(response.body).to eq(expected_response)
+        it "does not create a new entry in the chatroom_members table", :skip_before do
+          create(:chatroom_member, {user_id: user1.id, chatroom_id: chat1.id, has_left: true})
+          old_count = ChatroomMember.count
+          post :create, {chatroom_id: chat1.id}
+
+          expect(ChatroomMember.count).to eq(old_count)
+        end
+
+        it "updates the existing chatroom_member with attribute has_left: false" do
+          chatroom_member = ChatroomMember.find_by({user_id: user1.id, chatroom_id: chat1.id})
+
+          expect(chatroom_member).not_to eq(nil)
+          expect(chatroom_member.has_left).to eq(false)
+        end
+
+        it "responds with a serialized version of the chatroom", :skip_before do
+          create(:chatroom_member, {user_id: user1.id, chatroom_id: chat1.id, has_left: true})
+          create(:chatroom_member, {user_id: user2.id, chatroom_id: chat1.id, has_left: true})
+          post :create, {chatroom_id: chat1.id}
+
+          chatroom_member = ChatroomMember.find_by({user_id: user1.id, chatroom_id: chat1.id})
+          expected_response["membership_id"] = chatroom_member.id
+
+          expect(JSON.parse(response.body)).to eq(expected_response)
+        end
       end
     end
 
-    describe "when the chatroom member already exists" do
+    describe "when the chatroom member already exists and has not left" do
       before(:each) do
         post :create, {chatroom_id: chat1.id}
         post :create, {chatroom_id: chat1.id}
       end
 
-      it "responds with a 422 status code" do
-        expect(response).to have_http_status(422)
-      end
+      include_examples "responds with a 422 status code"
 
       it "states that the user has already been taken" do
-        expect(response.body).to include("User has already been taken")
+        expect(response.body).to include("Unprocessible entity - user is still a member of the chatroom, cannot re-add")
       end
     end
   end
@@ -164,9 +224,7 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
         end
       end
 
-      it "responds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      include_examples "responds with a successful status code"
 
       it "responds with a serialized version of the chatroom member, with has_left: true" do
         chatroom_member = ChatroomMember.find_chatroom_member(user1.id, chat1.id)
@@ -201,9 +259,7 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
           delete :destroy, {id: member2.id}
         end
 
-        it "responds with a 403 status code" do
-          expect(response).to have_http_status(403)
-        end
+        include_examples "responds with a 403 status code"
 
         it "states that the current user does not match the requested chatroom member" do
           expect(response.body).to include('Unauthorized action - current user is not the chatroom member')
@@ -215,9 +271,7 @@ RSpec.describe Api::ChatroomMembersController, type: :controller do
           delete :destroy, {id: 0}
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that the requested chatroom member does not exist" do
           expect(response.body).to include('Unprocessible entity - chatroom member with id: 0 does not exist')

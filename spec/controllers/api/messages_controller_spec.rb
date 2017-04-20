@@ -118,9 +118,7 @@ RSpec.describe Api::MessagesController, type: :controller do
       destroy_session
     end
 
-    it "responds with a successful status code" do
-      expect(response).to have_http_status(200)
-    end
+    include_examples "responds with a successful status code"
 
     it "renders a serialized version of the messages belonging to the chatroom" do
       expected_response = [
@@ -160,9 +158,7 @@ RSpec.describe Api::MessagesController, type: :controller do
         post :create, {chatroom_id: chat1.id, message: {body: body}}
       end
 
-      it "responds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      include_examples "responds with a successful status code"
 
       it "renders a serialized version of the message" do
         message = Message.last
@@ -185,9 +181,7 @@ RSpec.describe Api::MessagesController, type: :controller do
         post :create, {chatroom_id: chat1.id, message: {body: ""}}
       end
 
-      it "responds with a 422 status code" do
-        expect(response).to have_http_status(422)
-      end
+      include_examples "responds with a 422 status code"
 
       it "states that the body is too short" do
         expect(response.body).to include("Body is too short (minimum is 1 character)")
@@ -213,9 +207,7 @@ RSpec.describe Api::MessagesController, type: :controller do
         patch :update, {id: message.id, message: {body: updated_body}}
       end
 
-      it "responds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      include_examples "responds with a successful status code"
 
       it "renders a serialized version of the updated message" do
         expected_response = {
@@ -236,9 +228,7 @@ RSpec.describe Api::MessagesController, type: :controller do
           patch :update, {id: 0, message: {body: ""}}
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that the message does not exist" do
           expect(response.body).to include("Unprocessible entity - Message id: 0 does not exist")
@@ -250,9 +240,7 @@ RSpec.describe Api::MessagesController, type: :controller do
           patch :update, {id: message.id, message: {body: ""}}
         end
 
-        it "responds with a 422 status code" do
-          expect(response).to have_http_status(422)
-        end
+        include_examples "responds with a 422 status code"
 
         it "states that the body is too short" do
           expect(response.body).to include("Body is too short (minimum is 1 character)")
@@ -266,9 +254,7 @@ RSpec.describe Api::MessagesController, type: :controller do
           patch :update, {id: user2_message.id, message: {body: "Should not update"}}
         end
 
-        it "responds with a 403 status code" do
-          expect(response).to have_http_status(403)
-        end
+        include_examples "responds with a 403 status code"
 
         it "states that the update is unauthorized" do
           expected_error_message = "Access forbidden - unauthorized to update message with id: #{user2_message.id}"

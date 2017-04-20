@@ -12,11 +12,32 @@ export const deleteChatroomMember = ({chatroomMemberId}) => {
   });
 };
 
+export const indexChatroomMembers = (chatroomId) => {
+  return $.ajax({
+    method: 'GET',
+    url: `/api/chatrooms/${chatroomId}/chatroom_members`
+  })
+}
+
+export const indexChatrooms = () => {
+  return $.ajax({
+    method: 'GET',
+    url: 'api/chatrooms'
+  })
+}
+
 export const createChatroom = (name) => {
   return $.ajax({
     method: 'POST',
     url: `api/chatrooms`,
     data: {chatroom: {name}}
+  })
+}
+
+export const indexMessages = (chatroomId) => {
+  return $.ajax({
+    method: 'GET',
+    url: `api/chatrooms/${chatroomId}/messages`
   })
 }
 

@@ -14,9 +14,7 @@ RSpec.describe Api::SessionsController, type: :controller do
         delete :destroy
       end
 
-      it "responds with a successful status code" do
-        expect(response).to have_http_status(200)
-      end
+      include_examples "responds with a successful status code"
 
       it "successfully logs in the user" do
         expect(current_user.id).to eq(user.id)
@@ -38,9 +36,7 @@ RSpec.describe Api::SessionsController, type: :controller do
         post :create, user: user_credentials
       end
 
-      it "responds with a 401 status code" do
-        expect(response).to have_http_status(401)
-      end
+      include_examples "responds with a 401 status code"
 
       it "states that the username/password combination is invalid" do
         expect(response.body).to include("Invalid username/password combination")
@@ -58,8 +54,9 @@ RSpec.describe Api::SessionsController, type: :controller do
         delete :destroy
       end
 
+      include_examples "responds with a successful status code"
+
       it "successfully logs out current user" do
-        expect(response).to have_http_status(200)
         expect(current_user).to eq(nil)
       end
 

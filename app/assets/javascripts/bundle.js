@@ -16604,7 +16604,7 @@ var createMessage = exports.createMessage = function createMessage(_ref) {
       body = _ref.body;
   return function (dispatch) {
     return APIUtil.createMessage({ chatroomId: chatroomId, body: body }).then(function (data) {
-      return dispatch(receive_new_message(data));
+      return dispatch(receiveNewMessage(data));
     }, function (error) {
       return dispatch(receiveUserChatroomError(error, CREATE_NEW_MESSAGE));
     });
@@ -17577,7 +17577,10 @@ var ChatroomsReducer = function ChatroomsReducer() {
 
     case _chatroom_actions.RECEIVE_NEW_MESSAGE:
       var targetChatroom = (0, _chatrooms_helper.findSelectedChatroom)(action.message.chatroom_id, newState.userChatrooms);
-      targetChatroom.messages.push(message);
+      targetChatroom.messages.push(action.message);
+      if (newState.currentChatroom && newState.currentChatroom.id === targetChatroom.id) {
+        newState.currentChatroom.messages.push(action.message);
+      }
       return newState;
 
     default:
@@ -43041,9 +43044,25 @@ var MessageArea = function (_React$Component) {
   _inherits(MessageArea, _React$Component);
 
   function MessageArea() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
     _classCallCheck(this, MessageArea);
 
-    return _possibleConstructorReturn(this, (MessageArea.__proto__ || Object.getPrototypeOf(MessageArea)).apply(this, arguments));
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = MessageArea.__proto__ || Object.getPrototypeOf(MessageArea)).call.apply(_ref, [this].concat(args))), _this), _this.handleFormSubmit = function () {
+      if (_this.inputField.value.length > 0) {
+        _this.props.createMessage({
+          body: _this.inputField.value,
+          chatroomId: _this.props.chatroom.id
+        });
+        _this.inputField.value = "";
+      }
+    }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
   _createClass(MessageArea, [{
@@ -43060,8 +43079,11 @@ var MessageArea = function (_React$Component) {
           name: chatroom.name }),
         _react2.default.createElement(_message_display_area2.default, { users: chatroom.users,
           messages: chatroom.messages }),
-        _react2.default.createElement(_message_writing_area2.default, { createMessage: function createMessage(data) {
-            return _this2.props.createMessage(data);
+        _react2.default.createElement(_message_writing_area2.default, { handleFormSubmit: function handleFormSubmit() {
+            return _this2.handleFormSubmit();
+          },
+          refCallback: function refCallback(input) {
+            _this2.inputField = input;
           } })
       );
     }
@@ -43453,10 +43475,28 @@ var _react = __webpack_require__(3);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _message_display_item = __webpack_require__(596);
+
+var _message_display_item2 = _interopRequireDefault(_message_display_item);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var MessageDisplayArea = function MessageDisplayArea(props) {
-  return _react2.default.createElement("div", { className: "message-display-area" });
+  return _react2.default.createElement(
+    'div',
+    { className: 'message-display-area-container' },
+    _react2.default.createElement(
+      'div',
+      { className: 'message-display-area' },
+      props.messages.map(function (message) {
+        return _react2.default.createElement(_message_display_item2.default, { body: message.body,
+          username: props.users[message.user_id],
+          timestamp: new Date(message.created_at),
+          key: message.id,
+          id: message.id });
+      })
+    )
+  );
 };
 
 exports.default = MessageDisplayArea;
@@ -43495,15 +43535,65 @@ var MessageWritingArea = function MessageWritingArea(props) {
         )
       ),
       _react2.default.createElement(
-        "div",
-        { className: "message-input-container" },
-        _react2.default.createElement("input", { type: "text" })
+        "form",
+        { className: "message-input-container", onSubmit: function onSubmit() {
+            return props.handleFormSubmit();
+          } },
+        _react2.default.createElement("input", { type: "text", ref: function ref(input) {
+            return props.refCallback(input);
+          } })
       )
     )
   );
 };
 
 exports.default = MessageWritingArea;
+
+/***/ }),
+/* 596 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(3);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MessageDisplayItem = function MessageDisplayItem(props) {
+
+  return _react2.default.createElement(
+    "div",
+    { className: "message-display-item" },
+    _react2.default.createElement(
+      "div",
+      { className: "username-and-time-container" },
+      _react2.default.createElement(
+        "span",
+        { className: "username" },
+        props.username
+      ),
+      _react2.default.createElement(
+        "span",
+        { className: "timestamp" },
+        props.timestamp.toLocaleString()
+      )
+    ),
+    _react2.default.createElement(
+      "div",
+      { className: "body" },
+      props.body
+    )
+  );
+};
+
+exports.default = MessageDisplayItem;
 
 /***/ })
 /******/ ]);

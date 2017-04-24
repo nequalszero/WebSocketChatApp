@@ -15,11 +15,52 @@
   font-size: 1.4em;
 }
 
-.message-display-area {
+
+
+
+
+.message-display-area-container {
   height: unquote("-webkit-calc(100% - #{$messageWritingAreaHeight} - #{$messageAreaChatroomDetailsHeight})");
   height: unquote("-moz-calc(100% - #{$messageWritingAreaHeight} - #{$messageAreaChatroomDetailsHeight})");
   height: unquote("calc(100% - #{$messageWritingAreaHeight} - #{$messageAreaChatroomDetailsHeight})");
+  padding: 10px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
+
+.message-display-area {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  padding-right: 17px;
+}
+
+.message-display-item {
+  padding-bottom: 10px;
+}
+
+.message-display-item .username-and-time-container {
+  display: inline-block;
+  padding-bottom: 2px;
+}
+
+.message-display-item .username {
+  font-weight: bold;
+  color: black;
+  padding-right: 10px;
+}
+
+.message-display-item .timestamp {
+  color: gray;
+}
+
+.message-display-item .body {
+  color: black;
+}
+
+
 
 .new-message-area-container {
   height: $messageWritingAreaHeight;

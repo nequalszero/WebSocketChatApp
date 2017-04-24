@@ -7,9 +7,9 @@ const MessageWritingArea = (props) => {
         <div className="add-feature">
           <span>+</span>
         </div>
-        <div className="message-input-container">
-          <input type="text"></input>
-        </div>
+        <form className="message-input-container" onSubmit={() => props.handleFormSubmit()}>
+          <input type="text" ref={(input) => props.refCallback(input)}></input>
+        </form>
       </div>
     </div>
   );

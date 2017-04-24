@@ -67,7 +67,7 @@ export const selectCurrentChatroom = (chatroomId) => ({
 export const createMessage = ({chatroomId, body}) => dispatch => {
   return APIUtil.createMessage({chatroomId, body})
     .then(
-      (data) => dispatch(receive_new_message(data)),
+      (data) => dispatch(receiveNewMessage(data)),
       (error) => dispatch(receiveUserChatroomError(error, CREATE_NEW_MESSAGE))
     )
 }

@@ -21,7 +21,7 @@ RSpec.describe Api::SessionsController, type: :controller do
       end
 
       it "gives the expected response" do
-        expected_response = {username: user.username, id: user.id, chatrooms: []}.to_json
+        expected_response = {username: user.username, id: user.id, chatrooms: [], nonUserChatrooms: []}.to_json
         expect(response.body).to eq(expected_response)
       end
 

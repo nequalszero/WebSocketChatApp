@@ -5,7 +5,7 @@ class Api::UsersController < ApplicationController
 		if @user.save
 			sign_in(@user)
       # render "api/users/show"
-			render json: @user.serialize_current_user
+			render json: new_session_response
 		else
 			render json: @user.errors.full_messages, status: 422
 		end
@@ -14,5 +14,9 @@ class Api::UsersController < ApplicationController
   private
   def user_params
     params.require(:user).permit(:username, :password)
+  end
+
+  def new_session_response
+    @user.serialize_current_user.merge({nonUserChatrooms: Chatroom.non_user_chatrooms(@user)})
   end
 end

@@ -8,13 +8,20 @@ RSpec.describe Api::UsersController, type: :controller do
       end
 
       let(:user) { User.find_by_username("new_username") }
-      let(:expected_response) { {username: user.username, id: user.id, chatrooms: []}.to_json }
+      let(:expected_response) {
+        JSON.parse({
+          username: user.username,
+          id: user.id,
+          chatrooms: [],
+          nonUserChatrooms: []
+        }.to_json)
+      }
 
       include_examples "responds with a successful status code"
 
       it "renders a JSON object with the correct information" do
         expect(user).not_to eq(nil)
-        expect(response.body).to eq(expected_response)
+        expect(JSON.parse(response.body)).to eq(expected_response)
       end
     end
 

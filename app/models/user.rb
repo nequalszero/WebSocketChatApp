@@ -80,7 +80,7 @@ class User < ActiveRecord::Base
                .includes(:users)
                .find_by(id: self.id)
     user_chatrooms = self.chatrooms.map { |chatroom| chatroom.serialize_for_current_user(user) }
-    {username: self.username, id: self.id, chatrooms: user_chatrooms }
+    { username: self.username, id: self.id, chatrooms: user_chatrooms }
   end
 
   private

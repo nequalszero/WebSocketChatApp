@@ -10,6 +10,34 @@ This project was setup using the project setup directions found below with some 
 5. Run `webpack --w` and `rails s` to start server and listen for changes.
 6. Open application at `localhost:3000`
 
+## Redux Store: Sample State
+```javascript
+  {
+    session: {
+      currentUser: {
+        username: "xyz",
+        id: 1
+      },
+      errors: {
+        login: [],
+        signup: []
+      },
+      activePanel: {
+        login: false,
+        signup: false
+      }
+    },
+    chatrooms: {
+      userChatrooms: [],
+      nonUserChatrooms: [],
+      errors: []
+    }
+  }
+```
+
+## Questions Along the Way
+1. Redundancy of merging old state with new state, and then copying a portion of the new state again (e.g. spread operator)
+
 ## Project Setup Checklist
 Here's a Rails/React/Redux setup checklist.
 

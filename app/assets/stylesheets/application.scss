@@ -14,8 +14,12 @@
 // CSS Reset
 @import "base/reset.scss";
 @import "base/colors.scss";
+@import "base/variables.scss";
 
 // Partials
 @import "partials/app.scss";
 @import "partials/header.scss";
 @import "partials/auth_modal.scss";
+@import "partials/client_area.scss";
+@import "partials/sidebar.scss";
+@import "partials/message_area.scss";

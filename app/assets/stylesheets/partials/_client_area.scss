@@ -1,0 +1,22 @@
+.client-area {
+  display: flex;
+  width: 100%;
+  font: 1em sans-serif;
+  height: unquote("-webkit-calc( 100% - #{$headerHeight} )");
+  height: unquote("-moz-calc( 100% - #{$headerHeight} )");
+  height: unquote("calc( 100% - #{$headerHeight} )");
+}
+
+.sidebar {
+  width: $sidebarWidth;
+  box-sizing: border-box;
+  background-color: #4D394B;
+  color: $sidebar-text-color;
+}
+
+.message-area {
+  width: unquote("-webkit-calc( 100% - #{$sidebarWidth} )");
+  width: unquote("-moz-calc( 100% - #{$sidebarWidth} )");
+  width: unquote("calc( 100% - #{$sidebarWidth} )");
+  box-sizing: border-box;
+}

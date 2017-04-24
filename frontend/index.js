@@ -18,12 +18,14 @@ const initializeStore = () => {
   if (window.localStorage.currentUser && JSON.parse(window.localStorage.currentUser)) {
     const { username, id, chatrooms } = JSON.parse(window.localStorage.currentUser);
     const currentUser = { username, id };
-    const otherChatrooms = JSON.parse(window.localStorage.otherChatrooms);
+    const nonUserChatrooms = JSON.parse(window.localStorage.nonUserChatrooms);
 
     const preloadedState = {
       session: Object.assign({}, defaultState, { currentUser: currentUser }),
-      // userChatrooms: chatrooms,
-      // otherChatrooms
+      chatrooms: {
+        userChatrooms: chatrooms,
+        nonUserChatrooms
+      }
     };
 
     return configureStore(preloadedState);

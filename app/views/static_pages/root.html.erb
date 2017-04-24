@@ -1,10 +1,10 @@
 <script id="bootstrap-current-user" type="text/javascript">
   <% if current_user %>
   	window.localStorage.setItem("currentUser", JSON.stringify( <%= current_user.serialize_current_user.to_json.html_safe %>))
-  	window.localStorage.setItem("otherChatrooms", JSON.stringify( <%= Chatroom.non_user_chatrooms(current_user).to_json.html_safe %>))
+  	window.localStorage.setItem("nonUserChatrooms", JSON.stringify( <%= Chatroom.non_user_chatrooms(current_user).to_json.html_safe %>))
   <% else %>
     window.localStorage.setItem("currentUser", JSON.stringify(""))
-    window.localStorage.setItem("otherChatrooms", JSON.stringify(""))
+    window.localStorage.setItem("nonUserChatrooms", JSON.stringify(""))
   <% end %>
 </script>
 

@@ -9,7 +9,7 @@ class Api::SessionsController < ApplicationController
 
     if @user
       sign_in(@user)
-      render json: @user.serialize_current_user
+      render json: new_session_response
     else
       render(
         json: ["Invalid username/password combination"],
@@ -22,5 +22,10 @@ class Api::SessionsController < ApplicationController
     @user = current_user
 		sign_out
 		render json: @user.serialize
+  end
+
+  private
+  def new_session_response
+    @user.serialize_current_user.merge({nonUserChatrooms: Chatroom.non_user_chatrooms(@user)})
   end
 end

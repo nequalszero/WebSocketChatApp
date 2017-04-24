@@ -1,0 +1,65 @@
+.conversation-details {
+  height: $messageAreaChatroomDetailsHeight;
+  padding: 7px 20px;
+  border-bottom: 1px solid $sidebar-text-color;
+}
+
+.conversation-details .name-and-number-of-members {
+  display: flex;
+  flex-direction: column;
+}
+
+.conversation-details .conversation-name {
+  color: black;
+  font-weight: bold;
+  font-size: 1.4em;
+}
+
+.message-display-area {
+  height: unquote("-webkit-calc(100% - #{$messageWritingAreaHeight} - #{$messageAreaChatroomDetailsHeight})");
+  height: unquote("-moz-calc(100% - #{$messageWritingAreaHeight} - #{$messageAreaChatroomDetailsHeight})");
+  height: unquote("calc(100% - #{$messageWritingAreaHeight} - #{$messageAreaChatroomDetailsHeight})");
+}
+
+.new-message-area-container {
+  height: $messageWritingAreaHeight;
+}
+
+$newMessageAreaMargin: 20px;
+$addFeatureWidth: 44px;
+
+.new-message-area {
+  display: flex;
+  height: 35px;
+  width: unquote("-webkit-calc( 100% - #{2*$newMessageAreaMargin} )");
+  width: unquote("-moz-calc( 100% - #{2*$newMessageAreaMargin} )");
+  width: unquote("calc( 100% - #{2*$newMessageAreaMargin} )");
+  border: 2px solid $sidebar-text-color;
+  border-radius: 6px;
+  margin-left: $newMessageAreaMargin;
+  margin-right: $newMessageAreaMargin;
+}
+
+.add-feature {
+  display: block;
+  width: $addFeatureWidth;
+  text-align: center;
+  color: gray;
+  font-size: 1.8em;
+}
+
+.message-input-container {
+  display: block;
+  width: unquote("-webkit-calc( 100% - #{$addFeatureWidth} )");
+  width: unquote("-moz-calc( 100% - #{$addFeatureWidth} )");
+  width: unquote("calc( 100% - #{$addFeatureWidth} )");
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 9px;
+  padding-right: 30px;
+  border-left: 2px solid $sidebar-text-color;
+}
+
+.message-input-container input {
+  width: 100%;
+}

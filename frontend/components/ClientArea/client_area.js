@@ -10,6 +10,21 @@ class ClientArea extends React.Component {
     }
   }
 
+  componentDidMount() {
+    // Pusher event listener for new messages created by other channel members
+    var pusher = new Pusher('62ce9c55c56e3b1a7fad', {
+      encrypted: true
+    });
+
+    this.props.userChatrooms.forEach((chatroom) => {
+      let channel = pusher.subscribe(`chatroom_${chatroom.id}`);
+
+      channel.bind('message_created', (data) => {
+        this.props.receiveNewMessage(data.message);
+      })
+    })
+  }
+
   authenticatedContent() {
     return (
       <div className="client-area">

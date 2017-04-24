@@ -17577,11 +17577,16 @@ var ChatroomsReducer = function ChatroomsReducer() {
 
     case _chatroom_actions.RECEIVE_NEW_MESSAGE:
       var targetChatroom = (0, _chatrooms_helper.findSelectedChatroom)(action.message.chatroom_id, newState.userChatrooms);
-      targetChatroom.messages.push(action.message);
-      if (newState.currentChatroom && newState.currentChatroom.id === targetChatroom.id) {
-        newState.currentChatroom.messages.push(action.message);
+
+      // Prevent double message creation from Pusher listening for the user's own messages.
+      if (targetChatroom.messages.length > 0 && targetChatroom.messages[targetChatroom.messages.length - 1].id !== action.message.id) {
+
+        targetChatroom.messages.push(action.message);
+        if (newState.currentChatroom && newState.currentChatroom.id === targetChatroom.id) {
+          newState.currentChatroom.messages.push(action.message);
+        }
+        return newState;
       }
-      return newState;
 
     default:
       return oldState;
@@ -43182,6 +43187,24 @@ var ClientArea = function (_React$Component) {
       }
     }
   }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      // Pusher event listener for new messages created by other channel members
+      var pusher = new Pusher('62ce9c55c56e3b1a7fad', {
+        encrypted: true
+      });
+
+      this.props.userChatrooms.forEach(function (chatroom) {
+        var channel = pusher.subscribe('chatroom_' + chatroom.id);
+
+        channel.bind('message_created', function (data) {
+          _this2.props.receiveNewMessage(data.message);
+        });
+      });
+    }
+  }, {
     key: 'authenticatedContent',
     value: function authenticatedContent() {
       return _react2.default.createElement(
@@ -43296,6 +43319,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var mapStateToProps = function mapStateToProps(state) {
   return {
+    userChatrooms: state.chatrooms.userChatrooms,
     authenticated: state.session.currentUser
   };
 };
@@ -43304,6 +43328,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return {
     selectCurrentChatroom: function selectCurrentChatroom(chatroomId) {
       return dispatch((0, _chatroom_actions.selectCurrentChatroom)(chatroomId));
+    },
+    receiveNewMessage: function receiveNewMessage(message) {
+      return dispatch((0, _chatroom_actions.receiveNewMessage)(message));
     }
   };
 };

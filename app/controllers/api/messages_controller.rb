@@ -11,6 +11,7 @@ class Api::MessagesController < ApplicationController
     @message = Message.new(new_message_params)
 
     if @message.save
+      Pusher.trigger('chatroom_' + @message.chatroom_id.to_s, 'message_created', {message: @message.serialize})
       render json: @message.serialize
     else
       render json: @message.errors.full_messages, status: 422

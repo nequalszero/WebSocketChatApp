@@ -62,11 +62,16 @@ const ChatroomsReducer = (oldState = _defaultState, action) => {
 
     case RECEIVE_NEW_MESSAGE:
       const targetChatroom = findSelectedChatroom(action.message.chatroom_id, newState.userChatrooms);
-      targetChatroom.messages.push(action.message);
-      if (newState.currentChatroom && newState.currentChatroom.id === targetChatroom.id) {
-        newState.currentChatroom.messages.push(action.message);
+
+      // Prevent double message creation from Pusher listening for the user's own messages.
+      if (targetChatroom.messages.length > 0 && (targetChatroom.messages[targetChatroom.messages.length - 1].id !== action.message.id)) {
+
+        targetChatroom.messages.push(action.message);
+        if (newState.currentChatroom && newState.currentChatroom.id === targetChatroom.id) {
+          newState.currentChatroom.messages.push(action.message);
+        }
+        return newState;
       }
-      return newState;
 
     default:
       return oldState;

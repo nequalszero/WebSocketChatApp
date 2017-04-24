@@ -37,6 +37,7 @@ This project was setup using the project setup directions found below with some 
 
 ## Questions Along the Way
 1. Redundancy of merging old state with new state, and then copying a portion of the new state again (e.g. spread operator)
+2. When using Pusher API for websocket, user's own message creation will update their page based on both server response and pusher event.  Where should the logic go to prevent the reducers from receiving the same action twice?
 
 ## Project Setup Checklist
 Here's a Rails/React/Redux setup checklist.

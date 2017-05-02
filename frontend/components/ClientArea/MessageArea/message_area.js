@@ -16,6 +16,7 @@ class MessageArea extends React.Component {
 
   render() {
     const chatroom = this.props.chatroom;
+    debugger
 
     return (
       <div className="message-area">

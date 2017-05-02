@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::SessionsController, type: :controller do
-  describe "creating a session" do
+  describe "#create" do
     let(:user_credentials) { attributes_for(:user, {username: "new_user", password: "password"}) }
     let!(:user) { create(:user, user_credentials) }
 
@@ -44,7 +44,7 @@ RSpec.describe Api::SessionsController, type: :controller do
     end
   end
 
-  describe "destroying a session" do
+  describe "destroy" do
     context "when there is an active session" do
       let(:user_credentials) { attributes_for(:user, {username: "new_user", password: "password"}) }
       let!(:user) { create(:user, user_credentials) }

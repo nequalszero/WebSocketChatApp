@@ -4,7 +4,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
   let(:user) { create(:user) }
 
   context "when no user is logged in" do
-    describe "index method" do
+    describe "#index" do
       before(:each) do
         get :index
       end
@@ -12,7 +12,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
       include_examples 'require logged in'
     end
 
-    describe "create method" do
+    describe "#create" do
       before(:each) do
         post :create, chatroom: {name: "Chatroom 1"}
       end
@@ -23,14 +23,10 @@ RSpec.describe Api::ChatroomsController, type: :controller do
 
   context "when a user is logged in" do
     before(:each) do
-      create_session(user)
+      allow(controller).to receive(:current_user).and_return(user)
     end
 
-    after(:each) do
-      destroy_session
-    end
-
-    describe "index method" do
+    describe "#index" do
       let(:room1) { create(:chatroom, name: "Room 1") }
       let!(:room2) { create(:chatroom, name: "Room 2") }
 
@@ -49,7 +45,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
       end
     end
 
-    describe "creating a chatroom" do
+    describe "#create" do
       context "with valid params" do
         before(:each) do
           post :create, chatroom: { name: "chatroom 1" }
@@ -99,7 +95,7 @@ RSpec.describe Api::ChatroomsController, type: :controller do
           before(:each) do
             post :create, chatroom: { name: "hi" }
           end
-          
+
           include_examples "responds with a 422 status code"
 
           it "should state that the name is too short" do

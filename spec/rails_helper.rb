@@ -6,7 +6,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'spec_helper'
 require 'rspec/rails'
 
-require 'database_cleaner'
+# require 'database_cleaner'
 # DatabaseCleaner.strategy = :truncation
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -37,23 +37,23 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.include Api::SessionsHelper, type: :controller
-  config.use_transactional_fixtures = false
+  config.use_transactional_fixtures = true
 
-  config.before(:suite) do
-    if config.use_transactional_fixtures?
-      raise(<<-MSG)
-        Delete line `config.use_transactional_fixtures = true` from rails_helper.rb
-        (or set it to false) to prevent uncommitted transactions being used in
-        JavaScript-dependent specs.
-
-        During testing, the app-under-test that the browser driver connects to
-        uses a different database connection to the database connection used by
-        the spec. The app's database connection would not be able to access
-        uncommitted transaction data setup over the spec's database connection.
-      MSG
-    end
-    DatabaseCleaner.clean_with(:truncation)
-  end
+  # config.before(:suite) do
+  #   if config.use_transactional_fixtures?
+  #     raise(<<-MSG)
+  #       Delete line `config.use_transactional_fixtures = true` from rails_helper.rb
+  #       (or set it to false) to prevent uncommitted transactions being used in
+  #       JavaScript-dependent specs.
+  #
+  #       During testing, the app-under-test that the browser driver connects to
+  #       uses a different database connection to the database connection used by
+  #       the spec. The app's database connection would not be able to access
+  #       uncommitted transaction data setup over the spec's database connection.
+  #     MSG
+  #   end
+  #   DatabaseCleaner.clean_with(:truncation)
+  # end
 
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
@@ -86,15 +86,15 @@ RSpec.configure do |config|
     config.include FactoryGirl::Syntax::Methods
   end
 
-  config.before(:each) do
-    DatabaseCleaner.strategy = :transaction
-  end
-
-  config.before(:each) do
-    DatabaseCleaner.start
-  end
-
-  config.append_after(:each) do
-    DatabaseCleaner.clean
-  end
+  # config.before(:each) do
+  #   DatabaseCleaner.strategy = :transaction
+  # end
+  #
+  # config.before(:each) do
+  #   DatabaseCleaner.start
+  # end
+  #
+  # config.append_after(:each) do
+  #   DatabaseCleaner.clean
+  # end
 end

@@ -22,7 +22,7 @@ RSpec.describe Api::MessagesController, type: :controller do
   let!(:member2) { create(:chatroom_member, {user_id: user2.id, chatroom_id: chat1.id}) }
 
   context "when no user is logged in" do
-    describe "index method" do
+    describe "#index" do
       before(:each) do
         get :index, chatroom_id: chat1.id
       end
@@ -30,7 +30,7 @@ RSpec.describe Api::MessagesController, type: :controller do
       include_examples 'require logged in'
     end
 
-    describe "create method" do
+    describe "#create" do
       before(:each) do
         post :create, {chatroom_id: chat1.id, message: {body: "this should not work"}}
       end
@@ -38,7 +38,7 @@ RSpec.describe Api::MessagesController, type: :controller do
       include_examples 'require logged in'
     end
 
-    describe "update method" do
+    describe "#update" do
       let(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
 
       before(:each) do
@@ -50,27 +50,23 @@ RSpec.describe Api::MessagesController, type: :controller do
   end
 
   context "when the requested chatroom does not exist" do
-    describe "index method" do
+    describe "#index" do
       before(:each) do
-        create_session(user1)
+        allow(controller).to receive(:current_user).and_return(user1)
         get :index, chatroom_id: 0
       end
 
-      after(:each) do
-        destroy_session
-      end
+      # after(:each) do
+      #   destroy_session
+      # end
 
       include_examples 'verify chatroom existance'
     end
 
-    describe "create method" do
+    describe "#create" do
       before(:each) do
-        create_session(user1)
+        allow(controller).to receive(:current_user).and_return(user1)
         post :create, {chatroom_id: 0, message: {body: "this should not work"}}
-      end
-
-      after(:each) do
-        destroy_session
       end
 
       include_examples 'verify chatroom existance'
@@ -81,14 +77,10 @@ RSpec.describe Api::MessagesController, type: :controller do
     let!(:user3) { create(:user, username: "User 3") }
 
     before(:each) do
-      create_session(user3)
+      allow(controller).to receive(:current_user).and_return(user3)
     end
 
-    after(:each) do
-      destroy_session
-    end
-
-    describe "index method" do
+    describe "#index" do
       before(:each) do
         get :index, {chatroom_id: chat1.id}
       end
@@ -96,7 +88,7 @@ RSpec.describe Api::MessagesController, type: :controller do
       include_examples "verify chatroom membership"
     end
 
-    describe "create method" do
+    describe "#create" do
       before(:each) do
         post :create, {chatroom_id: chat1.id}
       end
@@ -105,17 +97,13 @@ RSpec.describe Api::MessagesController, type: :controller do
     end
   end
 
-  context "index method" do
+  context "#index" do
     let!(:message1) { create(:message, {user_id: user1.id, chatroom_id: chat1.id}) }
     let!(:message2) { create(:message, {user_id: user2.id, chatroom_id: chat1.id}) }
 
     before(:each) do
-      create_session(user1)
+      allow(controller).to receive(:current_user).and_return(user1)
       get :index, chatroom_id: chat1.id
-    end
-
-    after(:each) do
-      destroy_session
     end
 
     include_examples "responds with a successful status code"
@@ -142,13 +130,9 @@ RSpec.describe Api::MessagesController, type: :controller do
     end
   end
 
-  context "create method" do
+  context "#create" do
     before(:each) do
-      create_session(user1)
-    end
-
-    after(:each) do
-      destroy_session
+      allow(controller).to receive(:current_user).and_return(user1)
     end
 
     describe "with valid parameters" do
@@ -189,17 +173,13 @@ RSpec.describe Api::MessagesController, type: :controller do
     end
   end
 
-  context "update method" do
+  context "#update" do
     let(:body) { "initial message" }
     let(:updated_body) { "updated message" }
     let!(:message) { create(:message, {user_id: user1.id, chatroom_id: chat1.id, body: body})}
 
     before(:each) do
       create_session(user1)
-    end
-
-    after(:each) do
-      destroy_session
     end
 
     describe "with valid parameters" do
@@ -266,11 +246,7 @@ RSpec.describe Api::MessagesController, type: :controller do
 
   context "strong parameters" do
     before(:each) do
-      create_session(user1)
-    end
-
-    after(:each) do
-      destroy_session
+      allow(controller).to receive(:current_user).and_return(user1)
     end
 
     it "should only permit body for creation" do

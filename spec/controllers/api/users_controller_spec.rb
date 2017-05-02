@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::UsersController, type: :controller do
-  describe "creating a user" do
+  describe "#create" do
     context "with valid params" do
       before(:each) do
         post :create, user: { username: "new_username", password: "password" }
